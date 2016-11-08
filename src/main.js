@@ -3,9 +3,12 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-// import auth from './auth'
+import auth from './auth'
+import App from './components/App.vue'
+import About from './components/About.vue'
+import Dashboard from './components/Dashboard.vue'
+import Login from './components/Login.vue'
 
-/*
 function requireAuth (to, from, next) {
   if (!auth.loggedIn()) {
     next({
@@ -16,21 +19,27 @@ function requireAuth (to, from, next) {
     next()
   }
 }
-*/
-
-const Foo = { template: '<div>foo</div>' }
-const Bar = { template: '<div>bar</div>' }
-
-const routes = [
-  { path: '/foo', component: Foo },
-  { path: '/bar', component: Bar }
-]
 
 const router = new VueRouter({
-  routes // short for routes: routes
+  mode: 'history',
+  base: __dirname,
+  routes: [
+    { path: '/about', component: About },
+    { path: '/dashboard', component: Dashboard, beforeEnter: requireAuth },
+    { path: '/login', component: Login },
+    { path: '/logout',
+      beforeEnter (to, from, next) {
+        auth.logout()
+        next('/')
+      }
+    }
+  ]
 })
 
 /* eslint-disable no-new */
 new Vue({
-  router
-}).$mount('#app')
+  el: '#app',
+  router,
+  // replace the content of <div id="app"></div> with App
+  render: h => h(App)
+})
